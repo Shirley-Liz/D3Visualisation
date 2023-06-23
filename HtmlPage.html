@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Visualisation in D3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!--<link rel="stylesheet" href="./StyleSheet.css">-->
+</head>
+<body>
+
+    <div>
+        <p> D3 Visualisations</p>
+        <p>love</p>
+        <p>Emmanuel</p>
+        <p>David</p>
+    </div>
+    <div>
+        <p>Shirley</p>
+    </div>
+    <p>x</p>
+    <svg width="960" height="500">
+        <rect x="0" y="0" width="300" height="200" fill="yellow"></rect>
+        <circle cx="400" cy="100" r=" 90"></circle>
+    </svg>
+    <div id="svgcontainer"></div>
+    <div id="chart"></div>
+    <div class="g"></div>
+    <script type="text/javascript" src="./index.js"></script>
+    <script>
+        // Set up the SVG container
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", 400)
+            .attr("height", 300);
+
+        // Define the chart dimensions
+        const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+        const width = +svg.attr("width") - margin.left - margin.right;
+        const height = +svg.attr("height") - margin.top - margin.bottom;
+
+        // Create a group element within the SVG for the chart
+        const chart = svg.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Load the data
+        d3.csv("/data/data.csv").then(data => {
+            // Convert numeric string values to numbers
+            data.forEach(d => {
+                d.pH = +d.pH;
+            });
+
+            // Create a linear scale for the y-axis
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.pH)])
+                .range([height, 0]);
+
+            // Create the y-axis
+            const yAxis = d3.axisLeft(yScale);
+            chart.append("g")
+                .call(yAxis);
+
+            // Create the bars
+            chart.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", d => d.SubCounty)
+                .attr("y", d => yScale(d.pH))
+                .attr("width", 40)
+                .attr("height", d => height - yScale(d.pH))
+                .attr("fill", "steelblue");
+        });
+
+    </script>
+</body>
+</html>
+
+
